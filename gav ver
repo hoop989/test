@@ -1,0 +1,100 @@
+//Program by Gavin Clemons and Tyler Hooper
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class TestScoreGrader {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // user inputs file name
+        System.out.print("Enter the name of the input file: ");
+        String inputFileName = scanner.nextLine();
+
+        // reads test scores
+        int[] testScores = readTestScoresFromFile(inputFileName);
+
+        // calculates the average
+        double average = calcAverage(testScores);
+
+        // displays the letter grades and average
+        displayGradesAndAverage(testScores, average);
+
+        // write to a file
+        String outputFileName = inputFileName.replace(".txt", "_ltr.txt");
+        writeLetterGradesToFile(testScores, outputFileName);
+
+        scanner.close();
+    }
+
+    // method reading test scores from file
+    private static int[] readTestScoresFromFile(String fileName) {
+        try {
+            Scanner fileScanner = new Scanner(new File(fileName));
+            int[] scores = new int[5];
+
+            for (int i = 0; i < 5 && fileScanner.hasNextInt(); i++) {
+                scores[i] = fileScanner.nextInt();
+            }
+
+            fileScanner.close();
+            return scores;
+        } catch (IOException e) {
+            System.err.println("Error reading from file: " + e.getMessage());
+            System.exit(1);
+            return null;
+        }
+    }
+
+    // method calculating the average of test scores
+    private static double calcAverage(int[] scores) {
+        int sum = 0;
+        // sum of test scores
+        for (int score : scores) {
+            sum += score;
+        }
+        // calculate and return average
+        return (double) sum / scores.length;
+    }
+
+    // method determining letter grade based on score
+    private static char determineGrade(int score) {
+        if (score >= 90) return 'A';
+        else if (score >= 80) return 'B';
+        else if (score >= 70) return 'C';
+        else if (score >= 60) return 'D';
+        else return 'F';
+    }
+
+    // method displaying grades and average on console
+    private static void displayGradesAndAverage(int[] scores, double average) {
+        System.out.println("Test Scores and Grades:");
+        for (int i = 0; i < scores.length; i++) {
+            char grade = determineGrade(scores[i]);
+            System.out.println("Test " + (i + 1) + ": " + scores[i] + " - Grade: " + grade);
+        }
+        // displays average
+        System.out.println("Average Score: " + average);
+    }
+
+    // method for writing letter grades to file
+    private static void writeLetterGradesToFile(int[] scores, String fileName) {
+        try {
+            FileWriter writer = new FileWriter(fileName);
+
+            for (int i = 0; i < scores.length; i++) {
+                char grade = determineGrade(scores[i]);
+                writer.write("Test " + (i + 1) + ": " + scores[i] + " - Grade: " + grade + "\n");
+            }
+            // writing average to file
+            writer.write("Average Score: " + calcAverage(scores));
+
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+    }
+}
